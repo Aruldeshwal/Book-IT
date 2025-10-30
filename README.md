@@ -101,9 +101,20 @@ The backend exposes a fully RESTful API for handling booking logic and data acce
 
 ***
 
+## ✨ Value-Added Feature: Dynamic Search Filter
+
+Beyond the core booking flow, this application includes a dynamic and performant **search filter** integrated directly into the main navigation header. This demonstrates functional initiative beyond the core assignment requirements.
+
+* **Front-End Performance:** The application uses a **500ms debounce** on the client-side input, ensuring the API is not overloaded by rapid keystrokes, which greatly enhances performance and responsiveness.
+* **Back-End Indexing:** The API endpoint (`GET /api/experiences`) utilizes **MongoDB's Mongoose querying capabilities** to perform a simultaneous, case-insensitive search across three critical fields:
+    * **`title`**
+    * **`description`**
+    * **`location`**
+* **Seamless UX:** Search results are instantly updated and filtered on the Home Page without requiring a full page reload, providing a modern, efficient user experience.
+
 ## 🌟 Live Submission & Repository
 
 **[MANDATORY STEP: Update these links upon final deployment]**
 
-* **Hosted Application Link:** `[INSERT LIVE VERCEL/NETLIFY LINK HERE]`
-* **GitHub Repository:** `[INSERT GITHUB REPO LINK HERE]`
+* **Hosted Application Link:** `(https://book-pnibfejrf-aruldeshwals-projects.vercel.app/)`
+* **Backend URL Link:** `https://book-it-7agp.onrender.com`
