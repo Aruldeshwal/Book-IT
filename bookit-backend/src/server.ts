@@ -7,40 +7,42 @@ import bookingRoutes from './routes/bookingRoutes';
 import promoRoutes from './routes/promoRoutes';
 
 dotenv.config();
-connectDB(); // Establish the database connection
+connectDB(); 
 
 const app = express();
 
-// --- CRITICAL CORS FIX ---
-// The origin of the request is the URL of your Vercel frontend.
-// The origin of the request is blocked unless explicitly whitelisted.
+// --- CRITICAL FINAL CORS FIX ---
+// Whitelist all necessary origins, including a robust check for Vercel's pattern.
+const RENDER_BACKEND_URL = 'https://book-it-7agp.onrender.com';
 
-// Replace this placeholder with your exact Vercel domain (e.g., https://book-it-gray.vercel.app)
-const VERCEL_FRONTEND_URL = 'https://book-it-rosy.vercel.app/'; 
-const RENDER_BACKEND_URL = 'https://book-it-7agp.onrender.com'; // Your Render URL
+const isAllowed = (origin: string | undefined): boolean => {
+    if (!origin) return true; // Allow requests with no origin (e.g., non-browser tools)
 
-const allowedOrigins = [
-    'http://localhost:5173', 
-    VERCEL_FRONTEND_URL, 
-    RENDER_BACKEND_URL
-];
+    const explicitOrigins = [
+        'http://localhost:5173', 
+        RENDER_BACKEND_URL,
+        'https://book-it-rosy.vercel.app', // Explicit Rosy domain
+    ];
+
+    if (explicitOrigins.includes(origin)) {
+        return true;
+    }
+
+    // CHECK FOR VERCEL SUBDOMAIN PATTERN: *.vercel.app
+    if (origin.endsWith('.vercel.app')) {
+        return true; 
+    }
+
+    return false;
+};
 
 app.use(cors({ 
     origin: (origin, callback) => {
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
-
-        // Check if the requesting origin is in our allowed list
-        if (allowedOrigins.includes(origin)) {
+        if (isAllowed(origin)) {
             return callback(null, true);
         }
         
-        // Final fallback: Allow the specific Vercel URL (in case of subtle trailing slash/protocol issues)
-        if (origin.startsWith(VERCEL_FRONTEND_URL)) {
-             return callback(null, true);
-        }
-
-        const msg = `The CORS policy for this site does not allow access from the Origin: ${origin}`;
+        const msg = `CORS Policy Error: Origin ${origin} is not allowed by the server.`;
         return callback(new Error(msg), false);
     },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -48,14 +50,8 @@ app.use(cors({
 }));
 // -------------------------
 
-app.use(express.json()); // To parse JSON bodies
+app.use(express.json()); 
 
-// Basic route for testing
-app.get('/', (req, res) => {
-    res.send('API is running with the utmost respect!');
-});
-
-// Use the routes
 app.use('/api/experiences', experienceRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/promo', promoRoutes);
