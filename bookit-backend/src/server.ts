@@ -1,20 +1,35 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import connectDB from './config/db'; // Assuming this file connects Mongoose
+import connectDB from './config/db';
 import experienceRoutes from './routes/experienceRoutes';
 import bookingRoutes from './routes/bookingRoutes';
 import promoRoutes from './routes/promoRoutes';
 
 dotenv.config();
-connectDB(); // Establish the database connection
+connectDB(); 
 
 const app = express();
 
-// Middleware:
-// IMPORTANT: Use the precise origin from your client for security
-app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173' })); 
-app.use(express.json()); // To parse JSON bodies
+// --- CRITICAL CORS FIX ---
+// Replace the old CORS middleware with this configuration:
+const allowedOrigins = [
+    'http://localhost:5173', 
+    'book-it-rosy.vercel.app', // <--- REPLACE WITH YOUR ACTUAL VERCEL DOMAIN
+    'https://book-it-7agp.onrender.com' // If you test your backend directly
+];
+
+app.use(cors({ 
+    origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+            const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    }
+}));
 
 // 💡 CRITICAL GLOBAL DEBUGGING MIDDLEWARE
 app.use((req, res, next) => {
