@@ -2,41 +2,85 @@ import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
 
 const ResultPage: React.FC = () => {
-  const location = useLocation();
-  const state = location.state as { success: boolean, confirmation?: any, message?: string };
+    const location = useLocation();
+    const state = location.state as { success: boolean, confirmation?: any, message?: string };
+    
+    // Custom colors from Figma:
+    const TEXT_DARK = '#161616';
+    const TEXT_GRAY = '#656565';
+    const BG_SECONDARY = '#E3E3E3';
+    
+    if (!state) {
+        return <div className="text-center p-8 text-xl text-red-600">A deplorable navigational error.</div>;
+    }
 
-  if (!state) {
-    return <div className="text-center text-red-600 text-lg">A deplorable navigational error.</div>;
-  }
+    const { success, confirmation, message } = state;
 
-  const { success, confirmation, message } = state;
+    // SVG for ep:success-filled (80px x 80px)
+    const SuccessIcon = () => (
+        <svg width="70" height="70" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M35 0C44.2826 0 53.185 3.68749 59.7487 10.2513C66.3125 16.815 70 25.7174 70 35C70 44.2826 66.3125 53.185 59.7487 59.7487C53.185 66.3125 44.2826 70 35 70C25.7174 70 16.815 66.3125 10.2513 59.7487C3.68749 53.185 0 44.2826 0 35C0 25.7174 3.68749 16.815 10.2513 10.2513C16.815 3.68749 25.7174 0 35 0ZM30.64 41.905L22.865 34.125C22.5863 33.8463 22.2554 33.6252 21.8912 33.4743C21.527 33.3235 21.1367 33.2458 20.7425 33.2458C20.3483 33.2458 19.958 33.3235 19.5938 33.4743C19.2296 33.6252 18.8987 33.8463 18.62 34.125C18.0571 34.6879 17.7408 35.4514 17.7408 36.2475C17.7408 37.0436 18.0571 37.8071 18.62 38.37L28.52 48.27C28.7979 48.5501 29.1286 48.7725 29.4929 48.9242C29.8572 49.076 30.2479 49.1541 30.6425 49.1541C31.0371 49.1541 31.4278 49.076 31.7921 48.9242C32.1564 48.7725 32.4871 48.5501 32.765 48.27L53.265 27.765C53.5475 27.4874 53.7722 27.1567 53.9261 26.7918C54.0801 26.427 54.1604 26.0352 54.1622 25.6392C54.164 25.2432 54.0875 24.8508 53.9369 24.4845C53.7863 24.1182 53.5647 23.7854 53.2848 23.5052C53.005 23.225 52.6724 23.003 52.3063 22.852C51.9402 22.701 51.5478 22.6239 51.1518 22.6253C50.7558 22.6267 50.364 22.7064 49.999 22.86C49.6339 23.0136 49.3029 23.2379 49.025 23.52L30.64 41.905Z" fill="#24AC39"/>
+</svg>
 
-  return (
-    <div className={`text-center p-8 rounded-xl shadow-2xl max-w-lg mx-auto ${success ? 'bg-green-100 border-4 border-green-500' : 'bg-red-100 border-4 border-red-500'}`}>
-      {success ? (
-        <>
-          <h2 className="text-4xl font-extrabold text-green-700 mb-4">✅ Booking Confirmed!</h2>
-          <p className="text-xl text-gray-700 mb-6">Your transaction has been executed with the utmost respectability, sir.</p>
-          <div className="text-left bg-white p-4 rounded-lg border border-green-200">
-            <p className="font-semibold">Confirmation ID: <span className="font-normal block break-all">{confirmation.bookingId}</span></p>
-            <p className="font-semibold">Final Price Paid: <span className="font-normal">${confirmation.finalPrice.toFixed(2)}</span></p>
-          </div>
-          <Link to="/" className="mt-8 inline-block bg-green-600 text-white py-3 px-6 rounded-full text-lg hover:bg-green-700 transition">
-            Return to the Catalogue
-          </Link>
-        </>
-      ) : (
-        <>
-          <h2 className="text-4xl font-extrabold text-red-700 mb-4">❌ Booking Failure!</h2>
-          <p className="text-xl text-gray-700 mb-6">A lamentable failure has occurred:</p>
-          <p className="text-lg font-mono bg-white p-4 rounded-lg border border-red-200">{message}</p>
-          <Link to="/" className="mt-8 inline-block bg-red-600 text-white py-3 px-6 rounded-full text-lg hover:bg-red-700 transition">
-            Start Anew
-          </Link>
-        </>
-      )}
-    </div>
-  );
+    );
+
+    // Common classes for the return button
+    const backButtonClasses = `px-4 py-2 text-base font-normal rounded-md transition hover:opacity-80`;
+
+    return (
+        <div className="min-h-screen pt-20 flex flex-col items-center justify-start bg-[#F9F9F9] font-sans text-center">
+            
+            {success ? (
+                // SUCCESS STATE
+                <div className="max-w-lg mx-auto flex flex-col items-center space-y-4">
+                    
+                    {/* Icon (80px x 80px) */}
+                    <SuccessIcon />
+
+                    {/* Booking Confirmed (font-size: 32px; font-weight: 500;) */}
+                    <h2 className="text-[32px] font-medium leading-10 text-center text-[${TEXT_DARK}]">
+                        Booking Confirmed
+                    </h2>
+
+                    {/* Ref ID (font-size: 20px; font-weight: 400; color: #656565) */}
+                    <p className="text-xl font-normal leading-6 text-center" style={{ color: TEXT_GRAY }}>
+                        Ref ID: {confirmation.bookingId}
+                    </p>
+                    
+
+                    {/* Back to Home Button (Frame 63) */}
+                    <Link 
+                        to="/" 
+                        className={backButtonClasses}
+                        style={{ background: BG_SECONDARY, color: TEXT_GRAY }}
+                    >
+                        Back to Home
+                    </Link>
+                </div>
+            ) : (
+                // FAILURE STATE (Using the established dark colors for clean failure reporting)
+                <div className="max-w-xl mx-auto flex flex-col items-center space-y-6 p-8 rounded-xl shadow-lg" style={{ background: '#FFD6D6' }}>
+                    
+                    <h2 className="text-3xl font-bold text-red-700">❌ Transaction Failed</h2>
+                    
+                    <p className="text-lg text-gray-700">
+                        A lamentable failure has occurred. Please review the details below, sir:
+                    </p>
+                    
+                    <p className="font-mono p-4 rounded-md text-sm w-full text-left" style={{ background: '#FFEBEB', border: '1px solid #FFD6D6', color: TEXT_DARK }}>
+                        {message}
+                    </p>
+
+                    <Link 
+                        to="/" 
+                        className={backButtonClasses + " bg-red-600 text-white"}
+                    >
+                        Try Another Experience
+                    </Link>
+                </div>
+            )}
+        </div>
+    );
 };
 
 export default ResultPage;

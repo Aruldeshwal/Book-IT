@@ -1,54 +1,78 @@
 import express from 'express';
 import Booking from '../models/BookingModel';
 import Experience from '../models/ExperienceModel';
+import mongoose from 'mongoose';
 
 const router = express.Router();
 
-// POST /bookings - Accept booking details and store them.
+// Utility for basic email validation
+const validateEmail = (email: string) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+};
+
+// POST /bookings - Accept booking details and store them with robust validation.
 router.post('/', async (req, res) => {
-    const { experienceId, slotDate, slotTime, userName, userEmail, finalPrice } = req.body;
+    const { experienceId, slotDate, slotTime, userName, userEmail, finalPrice, quantity } = req.body;
 
-    // Minimal Validation - A gentleman must have his credentials!
-    if (!experienceId || !slotDate || !slotTime || !userName || !userEmail || finalPrice === undefined) {
-        return res.status(400).json({ message: 'All required fields must be supplied, sir.' });
+    // 1. Initial Data Integrity & Validation
+    if (!experienceId || !slotDate || !slotTime || !userName || !userEmail || finalPrice === undefined || !quantity || quantity < 1) {
+        return res.status(400).json({ message: 'All required fields (including quantity) must be supplied, sir, and quantity must be positive.' });
     }
-
+    if (!validateEmail(userEmail)) {
+        return res.status(400).json({ message: 'The provided email address is not respectable.' });
+    }
+    if (typeof userName !== 'string' || userName.trim().length < 2) {
+        return res.status(400).json({ message: 'The full name must be a complete string.' });
+    }
+    
+    // 2. Find the Experience and Slot
     try {
-        // 1. Find the Experience and Slot
         const experience = await Experience.findById(experienceId);
         if (!experience) {
             return res.status(404).json({ message: 'The experience is simply not on the menu.' });
         }
 
+        // Find the specific slot based on date and time
         const slot = experience.slots.find(
             s => s.date.toISOString().split('T')[0] === new Date(slotDate).toISOString().split('T')[0] && s.time === slotTime
         );
 
         if (!slot) {
-            return res.status(400).json({ message: 'Selected slot is invalid or a brainroot error.' });
+            return res.status(404).json({ message: 'Selected date and time slot is invalid or misplaced.' });
+        }
+        
+        // 3. Capacity Check (Prevent Double-Booking)
+        const availableCapacity = slot.capacity - slot.bookedCount;
+        
+        if (quantity > availableCapacity) {
+            return res.status(400).json({ 
+                message: `Capacity exceeded! Only ${availableCapacity} spot(s) left.`,
+            });
         }
 
-        // 2. Prevent Double-Booking & Check Capacity
-        if (slot.bookedCount >= slot.capacity) {
-            // Update availability status if capacity is met (optional, for frontend clarity)
-            slot.isAvailable = false;
-            await experience.save(); 
+        if (!slot.isAvailable || availableCapacity < 1) {
+            slot.isAvailable = false; // Ensures status is accurate
+            await experience.save();
             return res.status(400).json({ message: 'Sold out! A lamentable predicament.' });
         }
+        
+        // 4. Atomic Update and Booking Creation
+        
+        // Update the slot's bookedCount and availability status
+        slot.bookedCount += quantity;
+        if (slot.bookedCount >= slot.capacity) {
+            slot.isAvailable = false;
+        }
 
-        // 3. Create the Booking
+        // Create the Booking Record
         const booking = new Booking({
-            experienceId, slotDate, slotTime, userName, userEmail, finalPrice,
+            experienceId, slotDate, slotTime, userName, userEmail, finalPrice, quantity, // Added quantity
+            isConfirmed: true,
         });
 
         await booking.save();
-
-        // 4. Update the Slot's bookedCount
-        slot.bookedCount += 1;
-        if (slot.bookedCount >= slot.capacity) {
-            slot.isAvailable = false;
-        }
-        await experience.save();
+        await experience.save(); // Save the updated slot count
 
         res.status(201).json({ 
             message: 'Booking confirmed! A transaction of the highest calibre.', 

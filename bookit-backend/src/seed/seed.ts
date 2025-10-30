@@ -1,94 +1,147 @@
-// src/seed.ts
 import mongoose from 'mongoose';
-import * as dotenv from 'dotenv'; // Use 'import * as' for better compatibility
-// Adjust the path as necessary for your project structure
-import Experience, { ISlot, IExperience } from '../models/ExperienceModel'; 
+import dotenv from 'dotenv';
+import Experience, { ISlot } from '../models/ExperienceModel'; 
 
 dotenv.config();
 
-// 💡 Define the exact structure of the mock data array for type safety
-// We use the imported IExperience interface for maximum rigor, but omit the Mongoose-specific fields
-interface MockExperience {
-    title: string;
-    description: string;
-    price: number;
-    duration: string;
-    image: string;
-    slots: ISlot[]; // The slots array uses the imported ISlot interface
-}
+// Helper to generate a future date string (e.g., today + N days)
+const getFutureDate = (days: number): Date => {
+    const date = new Date();
+    date.setDate(date.getDate() + days);
+    // Zero out time components to keep the date consistent (00:00:00Z)
+    date.setHours(0, 0, 0, 0); 
+    return date;
+};
 
 // --- Mock Data: Experiences and Slots ---
-const experiencesData: MockExperience[] = [
+const experiencesData = [
     {
-        title: "Gentleman's High-Seas Sailing Lesson",
-        description: "Master the nautical arts aboard a pristine yacht. Learn knot-tying and navigation. A truly distinguished experience.",
-        price: 350.00,
+        title: "The Kayaking Expedition",
+        description: "A serene paddle through lush mangroves and hidden creeks. Certified guide and all safety gear included. Experience the quiet majesty of the backwaters.",
+        price: 999.00,
         duration: "4 hours",
-        image: "https://images.unsplash.com/photo-1549488344-f89a80e1a14c?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        // The type assertion 'as ISlot[]' is no longer required due to the MockExperience interface!
+        location: "Udupi, Karnataka",
+        image: "/images/Kayaking.png", 
         slots: [
-            { date: new Date('2025-11-15T00:00:00Z'), time: "10:00 AM", capacity: 5, bookedCount: 0, isAvailable: true },
-            { date: new Date('2025-11-15T00:00:00Z'), time: "2:00 PM", capacity: 5, bookedCount: 2, isAvailable: true },
-            { date: new Date('2025-11-16T00:00:00Z'), time: "10:00 AM", capacity: 5, bookedCount: 5, isAvailable: false },
-            { date: new Date('2025-11-17T00:00:00Z'), time: "10:00 AM", capacity: 5, bookedCount: 0, isAvailable: true },
-        ],
+            { date: getFutureDate(3), time: "07:00 AM", capacity: 8, bookedCount: 4, isAvailable: true },
+            { date: getFutureDate(3), time: "09:00 AM", capacity: 8, bookedCount: 6, isAvailable: true },
+            { date: getFutureDate(4), time: "07:00 AM", capacity: 8, bookedCount: 8, isAvailable: false }, // Fully booked
+            { date: getFutureDate(5), time: "08:00 AM", capacity: 10, bookedCount: 0, isAvailable: true },
+        ] as ISlot[],
     },
     {
-        title: "Art of Fine Cigar and Whisky Pairing",
-        description: "An evening dedicated to refined tastes. Sample vintage single malts and rare Cuban cigars under the guidance of a sommelier.",
-        price: 180.00,
+        title: "Nandi Hills Sunrise Trek",
+        description: "Witness a spectacular dawn from the historic Nandi Hills. Includes transport, breakfast, and professional trekking leadership. An invigorating start to the day.",
+        price: 899.00,
+        duration: "6 hours",
+        location: "Bangalore",
+        image: "/images/NandiHills.png", 
+        slots: [
+            { date: getFutureDate(10), time: "04:00 AM", capacity: 15, bookedCount: 1, isAvailable: true },
+            { date: getFutureDate(10), time: "05:00 AM", capacity: 15, bookedCount: 0, isAvailable: true },
+            { date: getFutureDate(11), time: "04:00 AM", capacity: 15, bookedCount: 15, isAvailable: false }, // Fully booked
+        ] as ISlot[],
+    },
+    {
+        title: "Boat Cruise Sunset Safari",
+        description: "A luxury cruise to view coastal wildlife and the magnificent sunset over the Arabian Sea. Refreshments provided. Elegance on the high seas.",
+        price: 1899.00,
+        duration: "3 hours",
+        location: "Sunderban",
+        image: "/images/BoatCruise.png", 
+        slots: [
+            { date: getFutureDate(7), time: "04:30 PM", capacity: 20, bookedCount: 5, isAvailable: true },
+            { date: getFutureDate(8), time: "05:00 PM", capacity: 20, bookedCount: 0, isAvailable: true },
+        ] as ISlot[],
+    },
+    {
+        title: "Bungee Jumping Thrill",
+        description: "Experience the ultimate adrenaline rush from India's highest jump point. Safety inspected and certified by international standards. Courage required.",
+        price: 3499.00,
         duration: "2 hours",
-        image: "https://images.unsplash.com/photo-1628173429813-f47053ccbe77?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        location: "Manali",
+        image: "/images/BungeeJumping.png", 
         slots: [
-            { date: new Date('2025-11-20T00:00:00Z'), time: "7:00 PM", capacity: 10, bookedCount: 3, isAvailable: true },
-            { date: new Date('2025-11-21T00:00:00Z'), time: "7:00 PM", capacity: 10, bookedCount: 0, isAvailable: true },
-        ],
+            { date: getFutureDate(14), time: "11:00 AM", capacity: 5, bookedCount: 0, isAvailable: true },
+            { date: getFutureDate(15), time: "12:00 PM", capacity: 5, bookedCount: 1, isAvailable: true },
+        ] as ISlot[],
     },
     {
-        title: "Vintage Car Restoration Workshop",
-        description: "Spend a day with master mechanics learning the delicate touch required to restore classic automobiles to their former glory.",
-        price: 499.00,
-        duration: "Full Day",
-        image: "https://images.unsplash.com/photo-1549926442-53535914614a?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        title: "Aromatic Coffee Trail Walk",
+        description: "A guided walk through lush coffee plantations. Learn about the bean-to-cup process and enjoy fresh brews. A sensory delight.",
+        price: 750.00,
+        duration: "3 hours",
+        location: "Coorg, Karnataka",
+        image: "/images/CoffeeTrail.png", 
         slots: [
-            { date: new Date('2025-12-05T00:00:00Z'), time: "9:00 AM", capacity: 8, bookedCount: 1, isAvailable: true },
-            { date: new Date('2025-12-06T00:00:00Z'), time: "9:00 AM", capacity: 8, bookedCount: 0, isAvailable: true },
-        ],
+            { date: getFutureDate(6), time: "10:00 AM", capacity: 12, bookedCount: 2, isAvailable: true },
+            { date: getFutureDate(13), time: "02:00 PM", capacity: 12, bookedCount: 10, isAvailable: true },
+        ] as ISlot[],
+    },
+    {
+        title: "Silent Forest Overnight Camping",
+        description: "Spend a night under the stars deep within a protected forest. Includes dinner, bonfire, and guided nature interpretation. Pure tranquility.",
+        price: 1599.00,
+        duration: "2 days",
+        location: "Wayanad, Kerala",
+        image: "/images/Forest.png", 
+        slots: [
+            { date: getFutureDate(18), time: "03:00 PM", capacity: 15, bookedCount: 7, isAvailable: true },
+            { date: getFutureDate(25), time: "03:00 PM", capacity: 15, bookedCount: 15, isAvailable: false }, // Fully booked
+        ] as ISlot[],
+    },
+    {
+        title: "White Water River Rafting",
+        description: "Navigate class III and IV rapids on a thrilling river journey. All gear and professional raft masters are provided. Get ready for an adventure!",
+        price: 1200.00,
+        duration: "3 hours",
+        location: "Rishikesh, Uttarakhand",
+        image: "/images/River.png", 
+        slots: [
+            { date: getFutureDate(20), time: "09:30 AM", capacity: 25, bookedCount: 3, isAvailable: true },
+            { date: getFutureDate(21), time: "11:00 AM", capacity: 25, bookedCount: 0, isAvailable: true },
+        ] as ISlot[],
+    },
+    {
+        title: "Desert Sunrise Camel Safari",
+        description: "Experience the magic of a desert sunrise from atop a camel. A traditional Rajasthani breakfast is included. An unforgettable cultural trek.",
+        price: 1050.00,
+        duration: "5 hours",
+        location: "Jaisalmer, Rajasthan",
+        image: "/images/Sunrise.png", 
+        slots: [
+            { date: getFutureDate(22), time: "04:00 AM", capacity: 18, bookedCount: 8, isAvailable: true },
+            { date: getFutureDate(29), time: "04:00 AM", capacity: 18, bookedCount: 1, isAvailable: true },
+        ] as ISlot[],
     }
 ];
 
 // --- Database Connection and Seeding Logic ---
 
-const connectDB = async (): Promise<void> => {
+const connectDB = async () => {
     try {
-        const mongoUri: string = process.env.MONGO_URI || 'mongodb://localhost:27017/bookit_db';
-        const conn = await mongoose.connect(mongoUri);
+        // Use the environment variable for Mongo URI
+        const conn = await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/bookit_db');
         console.log(`\n💎 MongoDB Connected: ${conn.connection.host}`);
-    } catch (error) {
-        // 💡 Use the type guard 'instanceof Error' to access the message safely
-        const errorMessage = error instanceof Error ? error.message : 'An unknown database connection error occurred.';
-        console.error(`\n🚨 Error connecting to MongoDB: ${errorMessage}`);
+    } catch (error: any) {
+        console.error(`\n🚨 Error connecting to MongoDB: ${error.message}`);
         process.exit(1);
     }
 };
 
-const importData = async (): Promise<void> => {
+const importData = async () => {
     await connectDB();
     try {
-        console.log('⏳ Preparing to obliterate and replenish the catalogue...');
         // Obliterate the existing collection with extreme prejudice (drop all data)
         await Experience.deleteMany({}); 
 
         // Insert the new, respectable data
-        // 💡 'insertMany' expects an array matching the Mongoose Model's interface (IExperience). 
-        // We ensure the data conforms to the required fields.
-        await Experience.insertMany(experiencesData as IExperience[]);
+        await Experience.insertMany(experiencesData);
 
-        console.log('✅ Data Imported with utmost success! The catalogue is replenished.');
-        process.exit(0); // Explicitly use 0 for success
-    } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'An unknown data importation error occurred.';
-        console.error(`\n❌ A deplorable data importation failure: ${errorMessage}`);
+        console.log('✅ Data Imported with utmost success! The catalogue is replenished with refined experiences.');
+        process.exit();
+    } catch (error: any) {
+        console.error(`\n❌ A deplorable data importation failure: ${error.message}`);
         process.exit(1);
     }
 };

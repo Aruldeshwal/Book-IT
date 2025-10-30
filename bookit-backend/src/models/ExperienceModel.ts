@@ -14,6 +14,7 @@ export interface IExperience extends Document {
     price: number;
     duration: string;
     image: string;
+    location: string; 
     slots: ISlot[];
 }
 
@@ -31,6 +32,7 @@ const ExperienceSchema: Schema = new Schema({
     price: { type: Number, required: true },
     duration: { type: String, required: true },
     image: { type: String, required: true },
+    location: { type: String, required: true }, 
     slots: [SlotSchema],
 }, { timestamps: true });
 
