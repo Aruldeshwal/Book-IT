@@ -2,38 +2,29 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from './config/db';
-import experienceRoutes from './routes/experienceRoutes';
-import bookingRoutes from './routes/bookingRoutes';
-import promoRoutes from './routes/promoRoutes';
+import experienceRoutes from './routes/experienceRoutes'; // Explicit import
+import bookingRoutes from './routes/bookingRoutes';       // Explicit import
+import promoRoutes from './routes/promoRoutes';             // Explicit import
 
 dotenv.config();
-connectDB(); 
+connectDB(); // Establish the database connection
 
 const app = express();
 
-// --- CRITICAL FINAL CORS FIX ---
-// Whitelist all necessary origins, including a robust check for Vercel's pattern.
-const RENDER_BACKEND_URL = 'https://book-it-7agp.onrender.com';
-
+// --- CRITICAL CORS FIX ---
+// This robust check should cover all origins including Vercel and local development
 const isAllowed = (origin: string | undefined): boolean => {
-    if (!origin) return true; // Allow requests with no origin (e.g., non-browser tools)
+    if (!origin) return true; // Allow requests with no origin
 
+    // Allow *.vercel.app domain pattern
+    if (origin.endsWith('.vercel.app')) return true;
+
+    // Explicit whitelisting
     const explicitOrigins = [
         'http://localhost:5173', 
-        RENDER_BACKEND_URL,
-        'https://book-it-rosy.vercel.app', // Explicit Rosy domain
+        'https://book-it-7agp.onrender.com'
     ];
-
-    if (explicitOrigins.includes(origin)) {
-        return true;
-    }
-
-    // CHECK FOR VERCEL SUBDOMAIN PATTERN: *.vercel.app
-    if (origin.endsWith('.vercel.app')) {
-        return true; 
-    }
-
-    return false;
+    return explicitOrigins.includes(origin);
 };
 
 app.use(cors({ 
@@ -41,7 +32,6 @@ app.use(cors({
         if (isAllowed(origin)) {
             return callback(null, true);
         }
-        
         const msg = `CORS Policy Error: Origin ${origin} is not allowed by the server.`;
         return callback(new Error(msg), false);
     },
@@ -50,11 +40,20 @@ app.use(cors({
 }));
 // -------------------------
 
+// Middleware to parse JSON bodies
 app.use(express.json()); 
 
+// Basic test route
+app.get('/', (req, res) => {
+    res.send('API is running with the utmost respect!');
+});
+
+// --- FINAL ROUTE REGISTRATION ---
+// The Express server must explicitly use the imported route modules.
 app.use('/api/experiences', experienceRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/promo', promoRoutes);
+// ----------------------------------
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server is operating on port ${PORT}. A true gentleman's server!`));
