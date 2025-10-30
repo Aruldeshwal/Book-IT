@@ -2,24 +2,20 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from './config/db';
-import experienceRoutes from './routes/experienceRoutes'; // Explicit import
-import bookingRoutes from './routes/bookingRoutes';       // Explicit import
-import promoRoutes from './routes/promoRoutes';             // Explicit import
+import experienceRoutes from './routes/experienceRoutes'; 
+import bookingRoutes from './routes/bookingRoutes';       
+import promoRoutes from './routes/promoRoutes';             
 
 dotenv.config();
-connectDB(); // Establish the database connection
+connectDB(); 
 
 const app = express();
 
-// --- CRITICAL CORS FIX ---
-// This robust check should cover all origins including Vercel and local development
+// --- CRITICAL CORS FIX (as previously defined) ---
 const isAllowed = (origin: string | undefined): boolean => {
-    if (!origin) return true; // Allow requests with no origin
-
-    // Allow *.vercel.app domain pattern
+    if (!origin) return true; 
     if (origin.endsWith('.vercel.app')) return true;
 
-    // Explicit whitelisting
     const explicitOrigins = [
         'http://localhost:5173', 
         'https://book-it-7agp.onrender.com'
@@ -43,13 +39,17 @@ app.use(cors({
 // Middleware to parse JSON bodies
 app.use(express.json()); 
 
-// Basic test route
+// --- FINAL ROUTE REGISTRATION ---
+// Use the API route handler as the single entry point.
+// We remove the /api prefix from the app.use here and rely on the frontend
+// to hit the base URL, but we will leave the /api prefixes in the sub-routes.
+
+// Test route (for base URL check)
 app.get('/', (req, res) => {
     res.send('API is running with the utmost respect!');
 });
 
-// --- FINAL ROUTE REGISTRATION ---
-// The Express server must explicitly use the imported route modules.
+// CRITICAL: We explicitly register the routes with the /api prefix
 app.use('/api/experiences', experienceRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/promo', promoRoutes);
