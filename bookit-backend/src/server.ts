@@ -16,7 +16,7 @@ const app = express();
 // The origin of the request is blocked unless explicitly whitelisted.
 
 // Replace this placeholder with your exact Vercel domain (e.g., https://book-it-gray.vercel.app)
-const VERCEL_FRONTEND_URL = 'https://book-it-gray.vercel.app'; 
+const VERCEL_FRONTEND_URL = 'https://book-it-rosy.vercel.app/'; 
 const RENDER_BACKEND_URL = 'https://book-it-7agp.onrender.com'; // Your Render URL
 
 const allowedOrigins = [
