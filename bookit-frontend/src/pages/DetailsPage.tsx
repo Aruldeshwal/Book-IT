@@ -107,7 +107,11 @@ const DetailsPage: React.FC = () => {
                 <div className="lg:col-span-2 flex flex-col space-y-8"> {/* space-y-8 for vertical gap */}
                     
                     {/* Frame 27: Placeholder for the main image */}
-                    <div className="w-full rounded-xl overflow-hidden shadow-md h-[381px] bg-gray-300"> {/* h-[381px] matches Figma height */}
+                    <div 
+                        /* 💡 ADJUSTMENT: Smaller fixed height on mobile (h-[200px]) 
+                           💡 Restored original height only on large screens (lg:h-[381px]) */
+                        className="w-full rounded-xl overflow-hidden shadow-md h-[200px] lg:h-[381px] bg-gray-300"
+                    > 
                         <img 
                             src={detail.image} 
                             alt={detail.title} 
@@ -138,7 +142,8 @@ const DetailsPage: React.FC = () => {
                                     Choose date
                                 </h3>
                                 
-                                <div className="flex space-x-4 overflow-x-auto pb-1">
+                                {/* 💡 ADJUSTMENT HERE: Replaced space-x-4 overflow-x-auto with flex-wrap and gap-3 for proper wrapping 💡 */}
+                                <div className="flex flex-wrap gap-3">
                                     {detail.slots
                                         .reduce((dates: string[], slot) => {
                                             const dateString = new Date(slot.date).toISOString().split('T')[0];
@@ -157,7 +162,7 @@ const DetailsPage: React.FC = () => {
                                                         setSelectedSlot(null); 
                                                     }}
                                                     className={`
-                                                        px-3 py-2 text-sm rounded-md transition border 
+                                                        px-3 py-2 text-sm rounded-md transition border shrink-0
                                                         ${isSelected 
                                                             ? 'bg-[#FFD643] text-[#161616] border-transparent' 
                                                             : 'border-[#BDBDBD] text-[#838383] hover:border-[#FFD643]'
