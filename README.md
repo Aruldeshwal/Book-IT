@@ -116,5 +116,5 @@ Beyond the core booking flow, this application includes a dynamic and performant
 
 **[MANDATORY STEP: Update these links upon final deployment]**
 
-* **Hosted Application Link:** `(https://book-pnibfejrf-aruldeshwals-projects.vercel.app/)`
+* **Hosted Application Link:** `https://book-it-rosy.vercel.app/`
 * **Backend URL Link:** `https://book-it-7agp.onrender.com`
