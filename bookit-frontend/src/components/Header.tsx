@@ -66,11 +66,38 @@ const Header: React.FC<HeaderProps> = ({ searchTerm, onSearchChange }) => {
         shadow-md"
       >
         <div
-          className="flex items-center justify-center w-[100px] 
-          h-10 md:h-[55px] opacity-100 shrink-0"
-        >
-          <img src="/logo/HDlogo1.png" alt="logo.png" className="max-h-full max-w-full" />
-        </div>
+          className="flex items-center justify-center w-auto sm:w-[100px] h-10 md:h-[55px] opacity-100 shrink-0 mr-5"
+        >
+          <svg 
+  xmlns="http://www.w3.org/2000/svg" 
+  viewBox="0 0 24 30" 
+  fill="none" 
+  stroke-width="1.5" 
+  stroke-linecap="round" 
+  stroke-linejoin="round"
+  className='block w-full h-full'
+>
+  <title>Book-IT Full Logo (Round Icon with Text Below)</title>
+  
+  <g transform="translate(0, 0)"> 
+    <circle cx="12" cy="12" r="10" fill="#FFC000" stroke="#FFC000" stroke-width="1" />
+    <rect x="7" y="9" width="10" height="6" rx="1" fill="white" />
+    <line x1="7" y1="11.5" x2="17" y2="11.5" stroke="#FFC000" stroke-width="0.7" stroke-dasharray="2 2" />
+    <polyline points="9 13 11 15 15 10" stroke="#1B4985" stroke-width="1.8" fill="none" />
+  </g>
+
+  <text 
+    x="12" y="27" 
+    font-family="Arial, sans-serif" 
+    font-size="4" 
+    font-weight="bold" 
+    text-anchor="middle"
+  >
+    <tspan fill="#1B4985">Book</tspan>
+    <tspan fill="#FFC000">-IT</tspan>
+  </text>
+</svg>
+        </div>
 
         <div
           className="flex items-center
